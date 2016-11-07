@@ -455,7 +455,6 @@ fi
 AM_CONDITIONAL(HAVE_BCACHE, [test "x$have_bcache" = "xyes"])
 
 have_libblockdev_part=no
-have_libblockdev_part_spec=0
 SAVE_CFLAGS=$CFLAGS
 SAVE_LDFLAGS=$LDFLAGS
 CFLAGS="$GLIB_CFLAGS -I/usr/include/blockdev"
@@ -466,22 +465,45 @@ AC_CHECK_HEADERS(
           AC_CHECK_LIB(
               [bd_part],
               [bd_part_create_part],
-              [AC_DEFINE(HAVE_LIBBLOCKDEV_PART, 1,
-                         [Define if libbd_part is available])
-               have_libblockdev_part=yes
-               have_libblockdev_part_spec=1
+              [have_libblockdev_part=yes
                PART_CFLAGS="-I/usr/include/blockdev"
                PART_LDFLAGS="-lbd_part"],
-              have_libblockdev_part=no
-              have_libblockdev_part_spec=0)
+              have_libblockdev_part=no)
         ],
         have_libblockdev_part=no)
-AM_CONDITIONAL(HAVE_LIBBLOCKDEV_PART, [test "x$have_libblockdev_part" = "xyes"])
-AC_SUBST([have_libblockdev_part_spec])
+if test "x$have_libblockdev_part" = "xno"; then
+  AC_MSG_ERROR([PART support requested but header or library not found])
+fi
 AC_SUBST([PART_CFLAGS])
 AC_SUBST([PART_LDFLAGS])
 CFLAGS=$SAVE_CFLAGS
 LDFLAGS=$SAVE_LDFLAGS
+
+# libblockdev fs
+SAVE_CFLAGS=$CFLAGS
+SAVE_LDFLAGS=$LDFLAGS
+
+CFLAGS="$GLIB_CFLAGS -I/usr/include/blockdev"
+LDFLAGS="$GLIB_LIBS"
+AC_MSG_CHECKING([libblockdev-fs presence])
+AC_TRY_COMPILE([#include <fs.h>], [],
+               [AC_MSG_RESULT([yes])
+               have_fs=yes],
+               [AC_MSG_RESULT([no])
+               have_fs=no])
+
+CFLAGS=$SAVE_CFLAGS
+LDFLAGS=$SAVE_LDFLAGS
+
+FS_CFLAGS="-I/usr/include/blockdev"
+FS_LIBS="-lbd_fs"
+
+if test "x$have_fs" = "xno"; then
+  AC_MSG_ERROR([FS support requested but header or library not found])
+fi
+
+AC_SUBST([FS_CFLAGS])
+AC_SUBST([FS_LIBS])
 
 # libblockdev swap
 SAVE_CFLAGS=$CFLAGS

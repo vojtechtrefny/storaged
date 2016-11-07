@@ -102,6 +102,7 @@ libudisks_daemon_la_CFLAGS =                                                   \
 	$(LIBSYSTEMD_LOGIN_CFLAGS)                                             \
 	$(PART_CFLAGS)                                                         \
 	$(SWAP_CFLAGS)                                                         \
+	$(FS_CFLAGS)                                                           \
 	$(NULL)
 
 libudisks_daemon_la_LIBADD =                                                   \
@@ -115,6 +116,7 @@ libudisks_daemon_la_LIBADD =                                                   \
 	$(LIBSYSTEMD_LOGIN_LIBS)                                               \
 	$(PART_LDFLAGS)                                                        \
 	$(SWAP_LIBS)                                                        \
+	$(FS_LIBS)                                                             \
 	$(top_builddir)/udisks/libudisks2.la                                   \
 	$(NULL)
 
