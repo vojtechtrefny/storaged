@@ -943,8 +943,6 @@ read_passphrase (void)
   str = NULL;
 
  out:
-  if (str != NULL)
-    g_string_free (str, TRUE);
   return ret;
 }
 
