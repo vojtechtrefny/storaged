@@ -166,9 +166,12 @@ class RAIDLevel(udiskstestcase.UdisksTestCase):
 
         # test if mdadm see all members
         for member in self.members:
-            self.assertIn('MD_DEVICE_%s_DEV' % member.name, md_data.keys())
-            self.assertIn('MD_DEVICE_%s_ROLE' % member.name, md_data.keys())
-            self.assertEqual(md_data['MD_DEVICE_%s_DEV' % member.name], member.path)
+            if 'MD_DEVICE_%s_DEV' % member.name in md_data.keys():
+                self.assertEqual(md_data['MD_DEVICE_%s_DEV' % member.name], member.path)
+            elif 'MD_DEVICE_ev_%s_DEV' % member.name in md_data.keys():
+                self.assertEqual(md_data['MD_DEVICE_ev_%s_DEV' % member.name], member.path)
+            else:
+                self.fail('RAID member %s not found in mdadm output.')
 
         # test if udisks see all (active) members
         dbus_devices = self.get_property(array, '.MDRaid', 'ActiveDevices')
