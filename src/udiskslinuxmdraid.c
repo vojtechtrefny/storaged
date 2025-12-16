@@ -235,6 +235,7 @@ udisks_linux_mdraid_update (UDisksLinuxMDRaid       *mdraid,
   const gchar *level = NULL;
   const gchar *uuid = NULL;
   const gchar *name = NULL;
+  const gchar *devfile = NULL;
   gchar *sync_action = NULL;
   gchar *sync_completed = NULL;
   gchar *bitmap_location = NULL;
@@ -316,7 +317,9 @@ udisks_linux_mdraid_update (UDisksLinuxMDRaid       *mdraid,
           degraded = read_sysfs_attr_as_int (raid_device->udev_device, "md/degraded");
           sync_action = read_sysfs_attr (raid_device->udev_device, "md/sync_action");
           sync_completed = read_sysfs_attr (raid_device->udev_device, "md/sync_completed");
-          bitmap_location = read_sysfs_attr (raid_device->udev_device, "md/bitmap/location");
+          devfile = g_udev_device_get_device_file (raid_device->udev_device);
+          if (devfile)
+            bitmap_location = bd_md_get_bitmap_location (devfile, NULL);
         }
 
       if (mdraid_has_stripes (level))
